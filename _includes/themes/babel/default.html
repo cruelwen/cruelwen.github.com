@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta content="True" name="HandheldFriendly" />
+    <meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0; name='viewport'" />
+    <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+    <meta name="author" content="{{ site.author.name }}">
+    <link href="{{ ASSET_PATH }}/css/default.css" media="screen" type="text/css"   rel="stylesheet">
+    <link rel="shortcut icon" href="{{ ASSET_PATH }}/img/favicon.ico" />
+    <link rel="apple-touch-icon" href="{{ ASSET_PATH }}/img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ ASSET_PATH }}/img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ ASSET_PATH }}/img/apple-touch-icon-114x114.png">
+    {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery.lazyload.js"></script>
+    <script type="text/javascript" src="{{ ASSET_PATH }}/js/jquery.scrolltotop.js"></script>
+    <script type="text/javascript">
+        jQuery(function($){
+            $.scrolltotop({className: 'totop'});
+            $("img").lazyload({
+                failurelimit : 10,
+                effect : "fadeIn"
+            });
+            $("a[rel*=external]").attr("target","_blank");
+        });
+    </script>
+</head>
+
+<body>
+<div id="Top" style="background-image: url('{{ ASSET_PATH }}/img/bg_top_light.png')"><a href="#;" name="_top"></a>
+    <div id="TopMain">
+        <div id="Navigation">
+            <ul>
+                <li><a href="{{ HOME_PATH }}" alt="{{ site.title }}" class="top">Home</a></li>
+                {% assign pages_list = site.pages %}
+                {% assign group = 'navigation' %}
+                {% include JB/pages_list %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="Wrapper" style="background-image: url('/assets/themes/babel/img/swatch.gif')">
+    <div id="Main">
+    <div id="Sidebar"></div>
+    <div id="Rightbar">
+        <div class="box">
+            <div class="cell">
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                        <td width="10" valign="top"></td>
+                        <td width="auto" align="left"><span class="bigger"><a href="/{{ site.author.id }}">{{ site.author.id }}</a></span>
+                            <div class="sep5"></div>
+                            <span class="fade">{{ site.tagline }}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="cell"><span class="fade">{{ site.bio }}</span></div>
+            <div class="inner"><a href="atom.xml" target="_blank"><img src="{{ ASSET_PATH }}/img/rss.png" align="absmiddle" border="0" style="margin-top:-3px;"></a>&nbsp;<a href="atom.xml" target="_blank">RSS</a></div>
+        </div>
+        <div class="sep20"></div>          
+        <div class="box">
+            <div class="cell"><div class="fr"></div>
+                <span class="fade">Categories</span>
+            </div>
+            <div class="inner">
+            {% for category in site.categories %} 
+              <a  id="{{ category[0] }}-cat" href="/categories.html#{{ category[0] }}-ref" class="item_node">{{ category[0] | join: "/" }}</a>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="sep20"></div>
+        <div class="box">
+            <div class="cell"><div class="fr"></div>
+                <span class="fade">Tags</span>
+            </div>
+            <div class="inner">
+            {% for tag in site.tags %} 
+              <a  id="{{ tag[0] }}-tag" href="/tags.html#{{ tag[0] }}-ref" class="item_node">{{ tag[0] }}</a>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="sep20"></div>       
+    </div>
+        
+    <div id="Content">
+
+        {{ content }}
+        
+    </div>
+    <div class="c"></div>
+    </div>
+</div>
+    
+<div id="Bottom">
+    <div id="BottomMain">
+        <div class="fr" align="right"><a href="https://github.com/mojombo/jekyll" target="_blank"><img src="{{ ASSET_PATH }}/img/jekyll.png" border="0" alt="Jekyll" /></a><div class="sep10"></div><strong><a href="https://github.com/mojombo/jekyll" target="_blank">Jekyll is a simple, blog aware, static site generator. </a></strong></div>
+        <strong><a href="https://github.com/cruelwen" class="dark">Fork me on GitHub</a></strong> &nbsp; 
+        <div class="sep10"></div>
+        <div class="sep5"></div>
+        <span class="fade">Theme made by <a href="http://www.olivida.com/" target="_blank" class="dark"><strong>olivida</strong></a></span>
+        <div class="sep10"></div>
+        <small>VERSION: {{site.version}}<br />♥ Do have a faith in what you're doing.</small>
+    </div>
+</div>
+{% include JB/analytics %}
+</body>
+</html>

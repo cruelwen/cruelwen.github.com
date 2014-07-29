@@ -1,11 +1,10 @@
 require "rubygems"
 require 'rake'
 require 'yaml'
-require 'time'
 
 SOURCE = "."
 CONFIG = {
-  'version' => "0.3.0",
+  'version' => "0.2.0",
   'themes' => File.join(SOURCE, "_includes", "themes"),
   'layouts' => File.join(SOURCE, "_layouts"),
   'posts' => File.join(SOURCE, "_posts"),
@@ -40,22 +39,13 @@ module JB
   end #Path
 end #JB
 
-# Usage: rake post title="A Title" [date="2012-02-09"] [tags=[tag1,tag2]] [category="category"]
+# Usage: rake post title="A Title"
 desc "Begin a new post in #{CONFIG['posts']}"
 task :post do
   abort("rake aborted: '#{CONFIG['posts']}' directory not found.") unless FileTest.directory?(CONFIG['posts'])
   title = ENV["title"] || "new-post"
-  tags = ENV["tags"] || "[]"
-  category = ENV["category"] || ""
-  category = "\"#{category.gsub(/-/,' ')}\"" if !category.empty?
   slug = title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
-  begin
-    date = (ENV['date'] ? Time.parse(ENV['date']) : Time.now).strftime('%Y-%m-%d')
-  rescue => e
-    puts "Error - date format must be YYYY-MM-DD, please check you typed it correctly!"
-    exit -1
-  end
-  filename = File.join(CONFIG['posts'], "#{date}-#{slug}.#{CONFIG['post_ext']}")
+  filename = File.join(CONFIG['posts'], "#{Time.now.strftime('%Y-%m-%d')}-#{slug}.#{CONFIG['post_ext']}")
   if File.exist?(filename)
     abort("rake aborted!") if ask("#{filename} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
   end
@@ -65,9 +55,8 @@ task :post do
     post.puts "---"
     post.puts "layout: post"
     post.puts "title: \"#{title.gsub(/-/,' ')}\""
-    post.puts 'description: ""'
-    post.puts "category: #{category}"
-    post.puts "tags: #{tags}"
+    post.puts "category: "
+    post.puts "tags: []"
     post.puts "---"
     post.puts "{% include JB/setup %}"
   end
@@ -92,7 +81,6 @@ task :page do
     post.puts "---"
     post.puts "layout: page"
     post.puts "title: \"#{title}\""
-    post.puts 'description: ""'
     post.puts "---"
     post.puts "{% include JB/setup %}"
   end
@@ -100,7 +88,7 @@ end # task :page
 
 desc "Launch preview environment"
 task :preview do
-  system "jekyll serve -w"
+  system "jekyll --auto --server"
 end # task :preview
 
 # Public: Alias - Maintains backwards compatability for theme switching.
@@ -111,7 +99,7 @@ namespace :theme do
   # Public: Switch from one theme to another for your blog.
   #
   # name - String, Required. name of the theme you want to switch to.
-  #        The theme must be installed into your JB framework.
+  #        The the theme must be installed into your JB framework.
   #
   # Examples
   #
@@ -200,8 +188,8 @@ namespace :theme do
     # Mirror each file into the framework making sure to prompt if already exists.
     packaged_theme_files.each do |filename|
       file_install_path = File.join(JB::Path.base, filename)
-      if File.exist? file_install_path and ask("#{file_install_path} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
-        next
+      if File.exist? file_install_path
+        next if ask("#{file_install_path} already exists. Do you want to overwrite?", ['y', 'n']) == 'n'
       else
         mkdir_p File.dirname(file_install_path)
         cp_r File.join(packaged_theme_path, filename), file_install_path
@@ -266,7 +254,7 @@ end # end namespace :theme
 # Returns theme manifest hash
 def theme_from_git_url(url)
   tmp_path = JB::Path.build(:theme_packages, :node => "_tmp")
-  abort("rake aborted: system call to git clone failed") if !system("git clone #{url} #{tmp_path}")
+  system("git clone #{url} #{tmp_path}")
   manifest = verify_manifest(tmp_path)
   new_path = JB::Path.build(:theme_packages, :node => manifest["name"])
   if File.exist?(new_path) && ask("=> #{new_path} theme package already exists. Override?", ['y', 'n']) == 'n'
@@ -285,11 +273,9 @@ end
 #        
 # Returns theme manifest hash
 def verify_manifest(theme_path)
-  manifest_path = File.join(theme_path, "manifest.yml")
-  manifest_file = File.open( manifest_path )
-  abort("rake aborted: repo must contain valid manifest.yml") unless File.exist? manifest_file
-  manifest = YAML.load( manifest_file )
-  manifest_file.close
+  manifest = File.join(theme_path, "manifest.yml")
+  abort("rake aborted: repo must contain valid manifest.yml") unless File.exist? manifest
+  manifest = YAML.load_file(manifest)
   manifest
 end
 
@@ -306,6 +292,3 @@ def get_stdin(message)
   print message
   STDIN.gets.chomp
 end
-
-#Load custom rake scripts
-Dir['_rake/*.rake'].each { |r| load r }
