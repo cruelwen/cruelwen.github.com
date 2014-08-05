@@ -7,6 +7,22 @@ auto: true
 pygments: true
 paginate: 5
 
+markdown: redcarpet
+safe: true
+lsi: false
+
+kramdown:
+  input: GFM
+
+redcarpet:
+  extensions:
+  - with_toc_data
+  - hard_wrap
+  - no_intra_emphasis
+  - tables
+  - fenced_code_blocks
+  - autolink
+
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
 #
@@ -125,3 +141,4 @@ JB :
   #   ./_includes/custom/[HELPER]
   # where [HELPER] is the name of the helper you are overriding.
   
+
